@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/head.jpg" alt="YOLOv8s Object Detector" width="100%"/>
+  <img src="docs/head.jpg" alt="YOLOv8s Object Detector" width="50%"/>
 </p>
 
 <h1 align="center">YOLOv8s Object Detector — Desktop App</h1>
@@ -7,6 +7,17 @@
 <p align="center">
   A desktop application built with <strong>Electron + Tailwind CSS</strong> that uses <strong>YOLOv8s</strong> to detect objects in images, videos, and live webcam feeds.
 </p>
+
+---
+
+## App Preview
+
+<p align="center">
+  <img src="png/image_examble.png" alt="Image detection example" width="45%" style="margin-right: 5%;" />
+  <img src="png/video_examble.png" alt="Video detection example" width="45%" />
+</p>
+
+This repository includes the example screenshots above from `png/image_examble.png` and `png/video_examble.png` showing how the app looks during image and video detection.
 
 ---
 
