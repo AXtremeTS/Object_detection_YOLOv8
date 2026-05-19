@@ -240,11 +240,17 @@ ipcMain.on("window-close", () => mainWindow?.close());
 
 // ── Startup ───────────────────────────────────────────────────────────────────
 app.whenReady().then(() => {
-  const config = readConfig();
-  if (!config || !config.pythonExe) {
-    openSetupWindow();
-  } else {
+  if (app.isPackaged) {
+    // Packaged installer: Python is bundled inside, no config needed
     launchMainApp();
+  } else {
+    // Dev mode: need a local Python — show setup wizard if not configured yet
+    const config = readConfig();
+    if (!config || !config.pythonExe) {
+      openSetupWindow();
+    } else {
+      launchMainApp();
+    }
   }
 });
 
