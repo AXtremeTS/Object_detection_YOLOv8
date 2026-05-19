@@ -45,17 +45,20 @@ pip install -r requirements.txt
 
 This installs `ultralytics`, `opencv-python`, `numpy`, and `pillow`.
 
-### 3. Download model weights
+### 3. Model weights (auto-downloaded)
 
-The model files are **not included** in the repository (too large for git).  
-Download them and place them in the project root:
+**You don't need to download anything manually.**
 
-| File | Download |
-|---|---|
-| `yolov8s.pt` | [ultralytics/assets](https://github.com/ultralytics/assets/releases) |
-| `yolov8s-seg.pt` | Same page — only needed for **Draw mode** |
+When the app runs for the first time, `ultralytics` will automatically download the model weights:
 
-Or let ultralytics auto-download on first run — it will fetch the file automatically when the app starts.
+| File | Size | When |
+|---|---|---|
+| `yolov8s.pt` | ~22 MB | On first launch |
+| `yolov8s-seg.pt` | ~25 MB | First time you use **Draw mode** |
+
+The files are saved to the project root. After the first run they are cached and no download happens again.
+
+> If you're on a slow connection or offline, you can manually download them from the [Ultralytics releases page](https://github.com/ultralytics/assets/releases) and place them in the project root.
 
 ### 4. Install Electron dependencies
 
