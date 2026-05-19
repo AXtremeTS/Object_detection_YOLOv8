@@ -18,6 +18,9 @@ dist/
 pyinstaller_dist/
 build/
 
+# ── Local config (machine-specific) ──────────────────────────────────────
+python_config.json
+
 # ── Python ────────────────────────────────────────────────────────────────
 __pycache__/
 *.py[cod]
