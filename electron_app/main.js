@@ -108,6 +108,7 @@ function openSetupWindow() {
     backgroundColor: "#0f1117",
     titleBarStyle: "hidden",
     frame: false,
+    icon: path.join(__dirname, "renderer", "app.ico"),
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
       contextIsolation: true,
@@ -199,6 +200,9 @@ function launchMainApp() {
 
   startPython(pythonExe);
 
+  // Icon path works in both dev and packaged mode
+  const iconPath = path.join(__dirname, "renderer", "app.ico");
+
   mainWindow = new BrowserWindow({
     width:  1280,
     height: 820,
@@ -207,6 +211,7 @@ function launchMainApp() {
     backgroundColor: "#0f1117",
     titleBarStyle: "hidden",
     frame: false,
+    icon: iconPath,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
       contextIsolation: true,
