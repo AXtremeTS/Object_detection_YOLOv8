@@ -33,8 +33,8 @@ A desktop application built with **Electron + Tailwind CSS** that uses **YOLOv8s
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/Model_YOLOv8s.git
-cd Model_YOLOv8s
+git clone https://github.com/AXtremeTS/Object_detection_YOLOv8.git
+cd Object_detection_YOLOv8
 ```
 
 ### 2. Install Python dependencies
@@ -68,25 +68,6 @@ npm install
 cd ..
 ```
 
-### 5. Update the Python path in `electron_app/main.js`
-
-Open `electron_app/main.js` and find this line:
-
-```js
-const pythonExe = "C:\\Users\\[your username]\\AppData\\Local\\Programs\\Python\\Python311\\python.exe";
-```
-
-Replace it with the path to **your** Python 3.11 executable.
-
-To find it, run in your terminal:
-```bash
-# Windows
-where python
-
-# macOS / Linux
-which python3
-```
-
 ---
 
 ## Running the App
@@ -102,29 +83,41 @@ cd electron_app
 npm start
 ```
 
-The app window will open. The first launch takes a few extra seconds to load the model weights.
+### First launch — Python setup wizard
+
+On the very first run the app will show a **Python Setup** window instead of jumping straight in.
+
+It automatically scans your machine for all Python installations and lists them with their version and whether `ultralytics` is installed. Versions that have `ultralytics` are sorted to the top and pre-selected.
+
+1. Pick the Python you want to use from the list, **or** click **Browse…** to locate it manually
+2. Click **Confirm & Launch**
+
+The choice is saved to `python_config.json` and the setup window never appears again. To reset it (e.g. after installing a new Python), just delete `python_config.json`.
 
 ---
 
 ## Project Structure
 
 ```
-Model_YOLOv8s/
+Object_detection_YOLOv8/
 ├── electron_app/
-│   ├── main.js          # Electron main process
-│   ├── preload.js       # Secure IPC bridge
+│   ├── main.js               # Electron main process
+│   ├── preload.js            # Secure IPC bridge
 │   ├── package.json
 │   └── renderer/
-│       ├── index.html   # UI layout (3 tabs)
-│       ├── style.css    # Tailwind + custom styles
-│       └── app.js       # All UI logic
-├── png/                 # Sample test images
-├── ui_backend.py        # Python detection backend (JSON over stdin/stdout)
+│       ├── index.html        # Main UI (3 tabs)
+│       ├── style.css         # Tailwind + custom styles
+│       ├── app.js            # Main UI logic
+│       ├── setup.html        # Python setup wizard
+│       └── setup.js          # Setup wizard logic
+├── png/                      # Sample test images
+├── ui_backend.py             # Python detection backend
 ├── yolov8s_image_detect.py   # Standalone image detection script
 ├── yolov8s_video_detect.py   # Standalone video detection script
 ├── yolov8s_webcam_detect.py  # Standalone webcam detection script
 ├── requirements.txt
-├── launch.bat           # One-click launcher (Windows)
+├── build.bat                 # Builds standalone installer
+├── launch.bat                # One-click dev launcher (Windows)
 └── README.md
 ```
 
@@ -155,7 +148,7 @@ This produces a single `.exe` installer that users can run with **no Python, no 
 
 ### Prerequisites
 
-Make sure you have already completed the Setup steps above (Python deps + npm install).
+Complete the Setup steps above first (Python deps + npm install).
 
 ### Run the build
 
@@ -172,7 +165,7 @@ It runs 4 steps automatically:
 | 1 | Checks / installs PyInstaller |
 | 2 | Bundles `ui_backend.py` + Python + all deps → `pyinstaller_dist/ui_backend/` |
 | 3 | Installs Electron npm dependencies |
-| 4 | Packages Electron + bundles Python backend → `dist/` |
+| 4 | Packages Electron + bundled Python backend → `dist/` |
 
 ### Output
 
@@ -181,16 +174,11 @@ dist/
 └── YOLOv8s Detector Setup 1.0.0.exe   ← send this to anyone
 ```
 
-The installer includes:
-- The full Electron app (UI)
-- The bundled Python backend with ultralytics, OpenCV, PyTorch
-- Both model weight files (`yolov8s.pt` and `yolov8s-seg.pt`) if they exist locally when you build
-
 ### Notes
 
-- Build must be run on **Windows x64** to produce a Windows installer
-- The model `.pt` files must be present in the project root **before** running `build.bat` so PyInstaller can bundle them. If they aren't there yet, run the app in dev mode once first so they auto-download, then build
-- Build time is ~5–10 minutes depending on your machine
+- Build must be run on **Windows x64**
+- The model `.pt` files must be present in the project root before building — run the app in dev mode once first so they auto-download, then build
+- Build time is ~5–10 minutes
 
 ---
 
@@ -212,11 +200,14 @@ Electron spawns `ui_backend.py` as a child process. The renderer sends JSON comm
 
 ## Troubleshooting
 
+**Setup wizard shows no Python installations**  
+→ Click **Browse…** and navigate to your `python.exe` manually.
+
 **App opens but "Connecting…" never changes to "Model ready"**  
-→ Check that the Python path in `main.js` is correct and points to a Python with `ultralytics` installed.
+→ Delete `python_config.json` to re-run the setup wizard and pick a Python that has `ultralytics` installed.
 
 **`ModuleNotFoundError: No module named 'ultralytics'`**  
-→ Run `pip install ultralytics` using the same Python executable set in `main.js`.
+→ Run `pip install -r requirements.txt` using the Python you selected in the setup wizard.
 
 **Draw mode is slow on first use**  
 → It downloads `yolov8s-seg.pt` (~25 MB) on first run. Subsequent uses are fast.
