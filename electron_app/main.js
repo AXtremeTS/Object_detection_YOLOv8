@@ -1,20 +1,53 @@
 const { app, BrowserWindow, ipcMain, dialog } = require("electron");
 const path  = require("path");
+const fs    = require("fs");
 const { spawn } = require("child_process");
 
 let mainWindow;
 let pyProcess = null;
-let pendingCallbacks = {};   // not used — we broadcast all messages
+
+// ── Resolve paths for dev vs packaged ────────────────────────────────────────
+//
+// Dev layout:
+//   <project>/electron_app/main.js
+//   <project>/ui_backend.py
+//
+// Packaged layout (electron-builder extraResources):
+//   <install>/resources/ui_backend/ui_backend.exe   ← PyInstaller bundle
+//   <install>/resources/models/yolov8s.pt
+//   <install>/resources/models/yolov8s-seg.pt
+//
+function resolvePaths() {
+  const isPacked = app.isPackaged;
+
+  if (isPacked) {
+    // resources/ is next to the app.asar
+    const resourcesDir = process.resourcesPath;
+    const backendExe   = path.join(resourcesDir, "ui_backend", "ui_backend.exe");
+    const modelsDir    = path.join(resourcesDir, "models");
+    return { isPacked, backendExe, backendPy: null, modelsDir, cwd: modelsDir };
+  } else {
+    const projectRoot = path.join(__dirname, "..");
+    const backendPy   = path.join(projectRoot, "ui_backend.py");
+    // Dev: use hardcoded Python path (update this to your local Python 3.11)
+    const pythonExe   = "C:\\Users\\axtre\\AppData\\Local\\Programs\\Python\\Python311\\python.exe";
+    return { isPacked, backendExe: null, backendPy, pythonExe, cwd: projectRoot };
+  }
+}
 
 // ── Spawn Python backend ──────────────────────────────────────────────────────
 function startPython() {
-  const backendPath = path.join(__dirname, "..", "ui_backend.py");
-  // Use Python 3.11 where ultralytics is installed
-  const pythonExe = "C:\\Users\\axtre\\AppData\\Local\\Programs\\Python\\Python311\\python.exe";
-  pyProcess = spawn(pythonExe, [backendPath], {
-    cwd: path.join(__dirname, ".."),
-    stdio: ["pipe", "pipe", "pipe"],
-  });
+  const { isPacked, backendExe, backendPy, pythonExe, cwd, modelsDir } = resolvePaths();
+
+  let proc;
+  if (isPacked) {
+    // Run the PyInstaller-bundled exe directly
+    proc = spawn(backendExe, [], { cwd, stdio: ["pipe", "pipe", "pipe"] });
+  } else {
+    proc = spawn(pythonExe, [backendPy], { cwd, stdio: ["pipe", "pipe", "pipe"] });
+  }
+
+  pyProcess = proc;
 
   pyProcess.stdout.on("data", (data) => {
     const lines = data.toString().split("\n").filter(Boolean);

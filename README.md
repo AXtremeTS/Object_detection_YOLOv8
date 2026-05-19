@@ -147,6 +147,53 @@ python yolov8s_webcam_detect.py
 
 ---
 
+## Building a Standalone Installer (Windows)
+
+This produces a single `.exe` installer that users can run with **no Python, no Node.js, nothing else required**. The installer bundles everything — Electron, Chromium, and the full Python runtime with all dependencies.
+
+> **Expected output size: ~2–3 GB** (PyTorch is large)
+
+### Prerequisites
+
+Make sure you have already completed the Setup steps above (Python deps + npm install).
+
+### Run the build
+
+Double-click **`build.bat`** or run from terminal:
+
+```bash
+build.bat
+```
+
+It runs 4 steps automatically:
+
+| Step | What it does |
+|---|---|
+| 1 | Checks / installs PyInstaller |
+| 2 | Bundles `ui_backend.py` + Python + all deps → `pyinstaller_dist/ui_backend/` |
+| 3 | Installs Electron npm dependencies |
+| 4 | Packages Electron + bundles Python backend → `dist/` |
+
+### Output
+
+```
+dist/
+└── YOLOv8s Detector Setup 1.0.0.exe   ← send this to anyone
+```
+
+The installer includes:
+- The full Electron app (UI)
+- The bundled Python backend with ultralytics, OpenCV, PyTorch
+- Both model weight files (`yolov8s.pt` and `yolov8s-seg.pt`) if they exist locally when you build
+
+### Notes
+
+- Build must be run on **Windows x64** to produce a Windows installer
+- The model `.pt` files must be present in the project root **before** running `build.bat` so PyInstaller can bundle them. If they aren't there yet, run the app in dev mode once first so they auto-download, then build
+- Build time is ~5–10 minutes depending on your machine
+
+---
+
 ## How It Works
 
 ```

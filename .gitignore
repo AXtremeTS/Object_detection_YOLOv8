@@ -11,8 +11,12 @@
 
 # ── Node / Electron ───────────────────────────────────────────────────────
 electron_app/node_modules/
-electron_app/dist/
 electron_app/out/
+
+# ── Build output ─────────────────────────────────────────────────────────
+dist/
+pyinstaller_dist/
+build/
 
 # ── Python ────────────────────────────────────────────────────────────────
 __pycache__/
@@ -22,8 +26,6 @@ __pycache__/
 venv/
 env/
 *.egg-info/
-dist/
-build/
 
 # ── Kiro IDE internal ─────────────────────────────────────────────────────
 .skillsrc

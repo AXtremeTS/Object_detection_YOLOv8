@@ -11,8 +11,19 @@ import base64
 import threading
 import cv2
 import numpy as np
+from pathlib import Path
 from collections import Counter
 from ultralytics import YOLO
+
+# ── Resolve base directory (works both as .py and PyInstaller .exe) ───────────
+if getattr(sys, "frozen", False):
+    # Running as PyInstaller bundle — _MEIPASS is the temp extraction dir
+    BASE_DIR = Path(sys._MEIPASS)
+else:
+    BASE_DIR = Path(__file__).parent
+
+DET_MODEL_PATH = str(BASE_DIR / "yolov8s.pt")
+SEG_MODEL_PATH = str(BASE_DIR / "yolov8s-seg.pt")
 
 # ── Colour palette (BGR) ──────────────────────────────────────────────────────
 COLORS_BGR = [
@@ -27,9 +38,6 @@ COLORS_HEX = [
     "#9acd32", "#ffd700", "#7fff00", "#00bfff",
     "#ff7f50", "#00fa9a", "#da70d6", "#ffa07a",
 ]
-
-DET_MODEL_PATH = "yolov8s.pt"
-SEG_MODEL_PATH = "yolov8s-seg.pt"   # auto-downloaded on first use
 
 _det_model  = None   # detection model
 _seg_model  = None   # segmentation model
