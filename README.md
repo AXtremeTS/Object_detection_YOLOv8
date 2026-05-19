@@ -73,7 +73,7 @@ cd ..
 Open `electron_app/main.js` and find this line:
 
 ```js
-const pythonExe = "C:\\Users\\axtre\\AppData\\Local\\Programs\\Python\\Python311\\python.exe";
+const pythonExe = "C:\\Users\\[your username]\\AppData\\Local\\Programs\\Python\\Python311\\python.exe";
 ```
 
 Replace it with the path to **your** Python 3.11 executable.
