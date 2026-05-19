@@ -1,6 +1,12 @@
-# YOLOv8s Object Detector — Desktop App
+<p align="center">
+  <img src="docs/head.jpg" alt="YOLOv8s Object Detector" width="100%"/>
+</p>
 
-A desktop application built with **Electron + Tailwind CSS** that uses **YOLOv8s** to detect objects in images, videos, and live webcam feeds.
+<h1 align="center">YOLOv8s Object Detector — Desktop App</h1>
+
+<p align="center">
+  A desktop application built with <strong>Electron + Tailwind CSS</strong> that uses <strong>YOLOv8s</strong> to detect objects in images, videos, and live webcam feeds.
+</p>
 
 ---
 
