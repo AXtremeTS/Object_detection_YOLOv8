@@ -12,10 +12,9 @@
 
 ## App Preview
 
-<p align="center">
-  <img src="png/image_examble.png" alt="Image detection example" width="45%" style="margin-right: 5%;" />
-  <img src="png/video_examble.png" alt="Video detection example" width="45%" />
-</p>
+| Image detection | Video detection |
+|---|---|
+| ![Image detection example](png/image_examble.png) | ![Video detection example](png/video_examble.png) |
 
 This repository includes the example screenshots above from `png/image_examble.png` and `png/video_examble.png` showing how the app looks during image and video detection.
 
