@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nhan dien vat the</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            surface:  "#0f1117",
+            panel:    "#161b22",
+            card:     "#1c2333",
+            border:   "#30363d",
+            accent:   "#388bfd",
+            accentHover: "#58a6ff",
+            muted:    "#8b949e",
+            success:  "#3fb950",
+            warning:  "#d29922",
+            danger:   "#f85149",
+          },
+          fontFamily: {
+            mono: ["'JetBrains Mono'", "Consolas", "monospace"],
+          },
+        },
+      },
+    };
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="bg-surface text-white font-['Inter'] select-none overflow-hidden h-screen flex flex-col">
+
+  <!-- ── Title bar ─────────────────────────────────────────────────────────── -->
+  <div id="titlebar" class="flex items-center justify-between px-4 h-10 bg-panel border-b border-border shrink-0 drag-region">
+    <div class="flex items-center gap-2 no-drag">
+      <div class="w-3 h-3 rounded-full bg-danger cursor-pointer hover:brightness-125 transition" onclick="window.close()"></div>
+      <div class="w-3 h-3 rounded-full bg-warning cursor-pointer hover:brightness-125 transition" onclick="window.electronAPI?.minimize()"></div>
+      <div class="w-3 h-3 rounded-full bg-success cursor-pointer hover:brightness-125 transition" onclick="window.electronAPI?.maximize()"></div>
+    </div>
+    <div class="flex items-center gap-2 text-sm font-semibold text-muted">
+      <svg class="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7
+             -1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+      </svg>
+      APP nhan dien vat the
+    </div>
+    <div class="flex items-center gap-2 no-drag">
+      <div id="status-dot" class="w-2 h-2 rounded-full bg-warning animate-pulse"></div>
+      <span id="status-text" class="text-xs text-muted">Connecting…</span>
+    </div>
+  </div>
+
+  <!-- ── Tab bar ───────────────────────────────────────────────────────────── -->
+  <div class="flex items-end gap-1 px-4 pt-3 pb-0 bg-panel border-b border-border shrink-0">
+    <!-- Tab buttons (left) -->
+    <button class="tab-btn active" data-tab="image">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <rect x="3" y="3" width="18" height="18" rx="2" ry="2" stroke-width="2"/>
+        <circle cx="8.5" cy="8.5" r="1.5" stroke-width="2"/>
+        <polyline points="21 15 16 10 5 21" stroke-width="2"/>
+      </svg>
+      Image
+    </button>
+    <button class="tab-btn" data-tab="video">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <polygon points="23 7 16 12 23 17 23 7" stroke-width="2"/>
+        <rect x="1" y="5" width="15" height="14" rx="2" ry="2" stroke-width="2"/>
+      </svg>
+      Video
+    </button>
+    <button class="tab-btn" data-tab="webcam">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M15 10l4.553-2.069A1 1 0 0121 8.882v6.236a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/>
+      </svg>
+      Webcam
+    </button>
+
+    <!-- Spacer -->
+    <div class="flex-1"></div>
+
+    <!-- Draw mode toggle (right) -->
+    <div class="flex items-center mb-1 bg-card border border-border rounded-lg p-0.5 gap-0.5 no-drag">
+      <button id="mode-box" onclick="setDrawMode('box')"
+              class="mode-btn mode-active flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all">
+        <!-- bounding box icon -->
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <rect x="3" y="3" width="18" height="18" rx="2" stroke-width="2.5"/>
+          <line x1="3" y1="9" x2="21" y2="9" stroke-width="1.5" stroke-dasharray="2 2"/>
+          <line x1="9" y1="3" x2="9" y2="21" stroke-width="1.5" stroke-dasharray="2 2"/>
+        </svg>
+        Box
+      </button>
+      <button id="mode-draw" onclick="setDrawMode('draw')"
+              class="mode-btn flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all">
+        <!-- mask / polygon icon -->
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M12 3C7 3 3 7 3 12s4 9 9 9 9-4 9-9"/>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M15 3.5C17.5 5 19 7 19.5 9.5"/>
+          <circle cx="12" cy="12" r="3" fill="currentColor" opacity="0.3"/>
+        </svg>
+        Draw
+      </button>
+    </div>
+  </div>
+
+  <!-- ── Main content ───────────────────────────────────────────────────────── -->
+  <div class="flex-1 overflow-hidden flex flex-col">
+
+    <!-- IMAGE TAB -->
+    <div id="tab-image" class="tab-panel flex-1 flex overflow-hidden">
+      <!-- Left: controls + results -->
+      <div class="w-80 shrink-0 flex flex-col bg-panel border-r border-border overflow-hidden">
+        <!-- Drop zone -->
+        <div class="p-4 border-b border-border">
+          <div id="img-dropzone"
+               class="drop-zone rounded-xl border-2 border-dashed border-border h-36 flex flex-col items-center justify-center gap-2 cursor-pointer hover:border-accent transition-colors"
+               ondragover="event.preventDefault()" ondrop="handleImageDrop(event)" onclick="browseImage()">
+            <svg class="w-8 h-8 text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+            <p class="text-sm text-muted text-center">Drop image here<br/><span class="text-xs">or click to browse</span></p>
+          </div>
+          <p id="img-filename" class="mt-2 text-xs text-muted truncate hidden"></p>
+        </div>
+
+        <!-- Confidence slider -->
+        <div class="px-4 py-3 border-b border-border">
+          <div class="flex justify-between text-xs text-muted mb-1">
+            <span>Confidence threshold</span>
+            <span id="img-conf-val" class="text-accent font-mono">0.25</span>
+          </div>
+          <input id="img-conf" type="range" min="0.05" max="0.95" step="0.05" value="0.25"
+                 class="slider w-full"/>
+        </div>
+
+        <!-- Run button -->
+        <div class="px-4 py-3 border-b border-border">
+          <button id="img-run-btn" onclick="runImageDetection()"
+                  class="w-full py-2.5 rounded-lg bg-accent hover:bg-accentHover text-white font-semibold text-sm transition-colors flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <polygon points="5 3 19 12 5 21 5 3" stroke-width="2"/>
+            </svg>
+            Run Detection
+          </button>
+        </div>
+
+        <!-- Results panel -->
+        <div class="flex-1 overflow-y-auto p-4" id="img-results">
+          <div class="text-xs text-muted text-center mt-8">No results yet</div>
+        </div>
+      </div>
+
+      <!-- Right: image display -->
+      <div class="flex-1 flex items-center justify-center bg-surface p-4 overflow-hidden">
+        <div id="img-display" class="relative max-w-full max-h-full flex items-center justify-center">
+          <div class="text-muted text-sm flex flex-col items-center gap-3" id="img-placeholder">
+            <svg class="w-16 h-16 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1"
+                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+            <p class="opacity-40">Drop an image and click Run Detection</p>
+          </div>
+          <img id="img-output" class="hidden max-w-full max-h-full object-contain rounded-lg shadow-2xl" />
+        </div>
+      </div>
+    </div>
+
+    <!-- VIDEO TAB -->
+    <div id="tab-video" class="tab-panel hidden flex-1 flex overflow-hidden">
+      <!-- Left -->
+      <div class="w-80 shrink-0 flex flex-col bg-panel border-r border-border overflow-hidden">
+        <div class="p-4 border-b border-border">
+          <div id="vid-dropzone"
+               class="drop-zone rounded-xl border-2 border-dashed border-border h-36 flex flex-col items-center justify-center gap-2 cursor-pointer hover:border-accent transition-colors"
+               ondragover="event.preventDefault()" ondrop="handleVideoDrop(event)" onclick="browseVideo()">
+            <svg class="w-8 h-8 text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <polygon points="23 7 16 12 23 17 23 7" stroke-width="2"/>
+              <rect x="1" y="5" width="15" height="14" rx="2" ry="2" stroke-width="2"/>
+            </svg>
+            <p class="text-sm text-muted text-center">Drop video here<br/><span class="text-xs">or click to browse</span></p>
+          </div>
+          <p id="vid-filename" class="mt-2 text-xs text-muted truncate hidden"></p>
+        </div>
+
+        <div class="px-4 py-3 border-b border-border">
+          <div class="flex justify-between text-xs text-muted mb-1">
+            <span>Confidence threshold</span>
+            <span id="vid-conf-val" class="text-accent font-mono">0.25</span>
+          </div>
+          <input id="vid-conf" type="range" min="0.05" max="0.95" step="0.05" value="0.25"
+                 class="slider w-full"/>
+        </div>
+
+        <div class="px-4 py-3 border-b border-border flex gap-2">
+          <button id="vid-play-btn" onclick="toggleVideoPlayback()"
+                  class="flex-1 py-2.5 rounded-lg bg-accent hover:bg-accentHover text-white font-semibold text-sm transition-colors flex items-center justify-center gap-2">
+            <!-- icon swapped by JS -->
+            <svg id="vid-play-icon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <polygon points="5 3 19 12 5 21 5 3" stroke-width="2"/>
+            </svg>
+            <span id="vid-play-label">Play</span>
+          </button>
+          <button id="vid-stop-btn" onclick="stopVideoFull()"
+                  class="flex-1 py-2.5 rounded-lg bg-card hover:bg-border text-white font-semibold text-sm transition-colors flex items-center justify-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <rect x="6" y="6" width="12" height="12" rx="1" stroke-width="2"/>
+            </svg>
+            Stop
+          </button>
+        </div>
+
+        <div class="flex-1 overflow-y-auto p-4" id="vid-results">
+          <div class="text-xs text-muted text-center mt-8">No results yet</div>
+        </div>
+      </div>
+
+      <!-- Right -->
+      <div class="flex-1 flex flex-col bg-surface p-4 overflow-hidden gap-3">
+        <!-- Label filter bar (appears above video once playing) -->
+        <div id="vid-label-bar" class="flex flex-wrap gap-1 shrink-0 min-h-0"></div>
+
+        <!-- Video frame display -->
+        <div class="flex-1 flex items-center justify-center overflow-hidden min-h-0">
+          <div class="relative max-w-full max-h-full flex items-center justify-center">
+            <div class="text-muted text-sm flex flex-col items-center gap-3" id="vid-placeholder">
+              <svg class="w-16 h-16 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <polygon points="23 7 16 12 23 17 23 7" stroke-width="2"/>
+                <rect x="1" y="5" width="15" height="14" rx="2" ry="2" stroke-width="2"/>
+              </svg>
+              <p class="opacity-40">Drop a video file and click Play</p>
+            </div>
+            <img id="vid-output" class="hidden max-w-full max-h-full object-contain rounded-lg shadow-2xl" />
+          </div>
+        </div>
+
+        <!-- Seek bar + time (hidden until video starts) -->
+        <div id="vid-seekbar-wrap" class="hidden flex-col gap-1 px-1 shrink-0">
+          <input id="vid-seekbar" type="range" min="0" max="100" value="0"
+                 class="slider w-full"
+                 onmousedown="onSeekStart()"
+                 onmouseup="onSeekEnd(this.value)"
+                 oninput="onSeekInput(this.value)" />
+          <div class="flex justify-between text-xs font-mono text-muted px-0.5">
+            <span id="vid-time-cur">0:00</span>
+            <span id="vid-time-total">0:00</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- WEBCAM TAB -->
+    <div id="tab-webcam" class="tab-panel hidden flex-1 flex overflow-hidden">
+      <!-- Left -->
+      <div class="w-80 shrink-0 flex flex-col bg-panel border-r border-border overflow-hidden">
+        <div class="p-4 border-b border-border">
+          <div class="flex flex-col gap-3">
+            <div>
+              <label class="text-xs text-muted block mb-1">Camera index</label>
+              <input id="cam-index" type="number" value="0" min="0" max="9"
+                     class="w-full bg-card border border-border rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-accent"/>
+            </div>
+            <div>
+              <div class="flex justify-between text-xs text-muted mb-1">
+                <span>Confidence threshold</span>
+                <span id="cam-conf-val" class="text-accent font-mono">0.25</span>
+              </div>
+              <input id="cam-conf" type="range" min="0.05" max="0.95" step="0.05" value="0.25"
+                     class="slider w-full"/>
+            </div>
+          </div>
+        </div>
+
+        <div class="px-4 py-3 border-b border-border flex gap-2">
+          <button id="cam-start-btn" onclick="startWebcam()"
+                  class="flex-1 py-2.5 rounded-lg bg-success hover:brightness-110 text-white font-semibold text-sm transition-all flex items-center justify-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="3" stroke-width="2"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M15 10l4.553-2.069A1 1 0 0121 8.882v6.236a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/>
+            </svg>
+            Start Camera
+          </button>
+          <button id="cam-stop-btn" onclick="stopStream()"
+                  class="flex-1 py-2.5 rounded-lg bg-card hover:bg-border text-white font-semibold text-sm transition-colors flex items-center justify-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <rect x="6" y="6" width="12" height="12" rx="1" stroke-width="2"/>
+            </svg>
+            Stop
+          </button>
+        </div>
+
+        <div class="flex-1 overflow-y-auto p-4" id="cam-results">
+          <div class="text-xs text-muted text-center mt-8">Camera not started</div>
+        </div>
+      </div>
+
+      <!-- Right -->
+      <div class="flex-1 flex flex-col items-stretch bg-surface p-4 overflow-hidden gap-3">
+        <!-- Label filter bar (appears above webcam once running) -->
+        <div id="cam-label-bar" class="flex flex-wrap gap-1 shrink-0 min-h-0"></div>
+
+        <div class="flex-1 flex items-center justify-center overflow-hidden">
+          <div class="relative max-w-full max-h-full flex items-center justify-center">
+            <div class="text-muted text-sm flex flex-col items-center gap-3" id="cam-placeholder">
+              <svg class="w-16 h-16 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1"
+                  d="M15 10l4.553-2.069A1 1 0 0121 8.882v6.236a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/>
+              </svg>
+              <p class="opacity-40">Click Start Camera to begin</p>
+            </div>
+            <img id="cam-output" class="hidden max-w-full max-h-full object-contain rounded-lg shadow-2xl" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end main content -->
+
+  <script src="app.js"></script>
+</body>
+</html>

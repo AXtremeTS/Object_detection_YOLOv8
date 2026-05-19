@@ -1,0 +1,36 @@
+# ── Model weights (large binary files) ───────────────────────────────────
+*.pt
+*.onnx
+*.engine
+
+# ── Sample media (too large for git) ─────────────────────────────────────
+*.mp4
+*.avi
+*.mov
+*.mkv
+
+# ── Node / Electron ───────────────────────────────────────────────────────
+electron_app/node_modules/
+electron_app/dist/
+electron_app/out/
+
+# ── Python ────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+env/
+*.egg-info/
+dist/
+build/
+
+# ── Kiro IDE internal ─────────────────────────────────────────────────────
+.skillsrc
+.kiro/
+
+# ── OS / Editor ───────────────────────────────────────────────────────────
+.vscode/
+.DS_Store
+Thumbs.db
+desktop.ini
