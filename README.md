@@ -14,9 +14,7 @@
 
 | Image detection | Video detection |
 |---|---|
-| ![Image detection example](png/image_examble.png) | ![Video detection example](png/video_examble.png) |
-
-This repository includes the example screenshots above from `png/image_examble.png` and `png/video_examble.png` showing how the app looks during image and video detection.
+| ![Image detection example](png/image_examble.png) | ![Video detection example](png/video_examble.png)
 
 ---
 
